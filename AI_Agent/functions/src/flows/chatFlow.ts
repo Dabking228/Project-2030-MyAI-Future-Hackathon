@@ -67,6 +67,9 @@ Rules:
 - If a place name is ambiguous (multiple stops match): use searchTransitStops first
 - Pass coordinates precisely (4+ decimal places)
 - Never make up route data
+
+CRITICAL INSTRUCTION:
+When the tool returns its data, your final response MUST be exactly the raw JSON string returned by the tool. DO NOT add any conversational text, greetings, explanations, or markdown formatting (like \`\`\`json). Output ONLY the raw JSON.
 `.trim();
 
 //  Main chat flow
@@ -198,15 +201,45 @@ ${destList}
 // Helper: extract the last tool response JSON from generate() result
 
 function _extractLastToolResponse(generateResult: any): string {
+    // 1. Most reliable: Extract directly from Genkit's internal tool response history
+    try {
+        const messages = generateResult.request?.messages || [];
+        for (let i = messages.length - 1; i >= 0; i--) {
+            const msg = messages[i];
+            if (msg.role === "tool" && Array.isArray(msg.content)) {
+                for (const part of msg.content) {
+                    if (part.toolResponse && part.toolResponse.output) {
+                        const output = part.toolResponse.output;
+                        return typeof output === "string" ? output : JSON.stringify(output);
+                    }
+                }
+            }
+        }
+    } catch (e) {
+        console.warn("Failed to extract tool response from history", e);
+    }
+
     const text: string = generateResult.text ?? "{}";
 
+    // 2. Try stripping markdown blocks
+    try {
+        const cleanText = text
+            .replace(/^```json\s*/i, "")
+            .replace(/^```\s*/, "")
+            .replace(/\s*```$/, "")
+            .trim();
+        JSON.parse(cleanText);
+        return cleanText;
+    } catch { }
+
+    // 3. Fallback to regex extraction
     const jsonMatch = text.match(/(\{[\s\S]*\}|\[[\s\S]*\])/);
     if (jsonMatch) {
         try {
             JSON.parse(jsonMatch[0]);
             return jsonMatch[0];
         } catch {
-            // Fall through to return empty error object
+            // Fall through
         }
     }
 

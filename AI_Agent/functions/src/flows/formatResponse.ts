@@ -79,8 +79,10 @@ ${rec.carbon
                 : ""
             }
 
-Write a friendly, well-formatted chat response summarising this route.
-Always include the step-by-step instructions.
+Write a friendly, well-formatted chat response that:
+1. Gives the total journey time and cost
+2. Provides the FULL step-by-step instructions without omitting any stops
+3. Mentions the CO₂ benefit
 End with a brief encouragement to use public transport.
 `.trim();
 
@@ -134,10 +136,10 @@ export const formatTSPRouteFlow = ai.defineFlow(
         const legSummaries = tsp.legs_between_stops
             .map((leg, i) => {
                 const legMin = Math.round(leg.total_time_sec / 60);
-                const firstInstruction = leg.instructions[0] ?? "";
-                return `Leg ${i + 1}: ${firstInstruction} (~${legMin} min, RM ${leg.total_fare_myr.toFixed(2)})`;
+                const allInstructions = leg.instructions.join("\n  - ");
+                return `Leg ${i + 1} (Total: ~${legMin} min, RM ${leg.total_fare_myr.toFixed(2)}):\n  - ${allInstructions}`;
             })
-            .join("\n");
+            .join("\n\n");
 
         const systemPrompt = `
 You are a helpful Malaysian public transport assistant.
@@ -160,7 +162,7 @@ JOURNEY TOTALS:
 - Total fare: RM ${fare}
 - Total CO₂: ${Math.round(tsp.total_co2_grams)}g
 
-PER-LEG SUMMARY:
+PER-LEG DETAILS:
 ${legSummaries}
 
 TSP SOLVER REASONING:
@@ -169,7 +171,7 @@ ${tsp.reasoning}
 Write a friendly chat response that:
 1. Tells the user the optimal visit ORDER clearly
 2. Gives total journey time and cost
-3. Briefly summarises each leg
+3. Provides the full step-by-step instructions for each leg
 4. Mentions the CO₂ benefit
 `.trim();
 

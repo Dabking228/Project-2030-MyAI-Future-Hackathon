@@ -101,7 +101,7 @@ export const RouteResultSchema = z.object({
     co2_saved_grams: z.number(),
     instructions: z.array(z.string()),
     objective: z.string(),
-    carbon: CarbonSummarySchema.optional(),
+    carbon: CarbonSummarySchema.nullish(),
 });
 
 export const RouteResponseSchema = z.object({

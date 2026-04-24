@@ -1,0 +1,25 @@
+# Core
+fastapi==0.136.0
+uvicorn[standard]==0.44.0
+pydantic==2.13.0
+pydantic-settings==2.13.1
+ 
+# HTTP client (async, for GTFS downloads)
+httpx==0.28.1
+ 
+# Data processing
+pandas==3.0.2
+numpy==2.4.4
+ 
+# Graph / routing
+networkx==3.6.1
+ 
+# OR-Tools (TSP solver)
+ortools==9.15.6755
+ 
+# Protobuf (for GTFS Realtime .proto parsing)
+gtfs-realtime-bindings==2.0.0
+protobuf==6.33.6
+ 
+# Utilities
+python-dotenv==1.2.2
