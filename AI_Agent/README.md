@@ -1,7 +1,3 @@
-# AI Agent (Genkit + Vertex AI)
-
-This folder contains your Firebase Genkit setup utilizing Google Cloud's Vertex AI.
-
 ## Connecting to Your Google Cloud Project
 
 Since you already have a Google Cloud Project created, you'll need to authenticate your local environment to connect to it.
@@ -16,7 +12,6 @@ Since you already have a Google Cloud Project created, you'll need to authentica
    ```bash
    gcloud config set project YOUR_PROJECT_ID
    ```
-   *(Replace `YOUR_PROJECT_ID` with the actual project ID from your Google Cloud Console)*
 4. **Set Environment Variable (Optional but recommended)**:
    In your terminal, before running your Genkit app, set the `GCLOUD_PROJECT` environment variable:
    - **Windows (PowerShell)**: `$env:GCLOUD_PROJECT="YOUR_PROJECT_ID"`
