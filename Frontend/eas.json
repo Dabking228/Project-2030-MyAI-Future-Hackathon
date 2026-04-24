@@ -1,0 +1,25 @@
+{
+  "cli": {
+    "version": ">= 18.8.1",
+    "appVersionSource": "remote"
+  },
+  "build": {
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal"
+    },
+    "preview": {
+      "distribution": "internal",
+      "android": {
+        "buildType": "apk"
+      },
+      "env": {
+        "EXPO_PUBLIC_FASTAPI_URL": "https://sybar-ai-backend-539416240817.asia-southeast1.run.app/api/v1",
+        "EXPO_PUBLIC_USE_EMULATOR": "false"
+      }
+    },
+    "production": {
+      "autoIncrement": true
+    }
+  }
+}

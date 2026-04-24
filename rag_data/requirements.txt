@@ -1,0 +1,8 @@
+# Requirements for rag_data/ scripts
+# Install with: pip install -r requirements.txt
+
+google-cloud-aiplatform>=1.144.0   # Vertex AI SDK (includes RAG Engine API)
+google-cloud-storage>=3.10.1     # GCS bucket management
+httpx>=0.28.1                     # Async HTTP for GTFS feed downloads
+pandas>=3.0.2                    # GTFS CSV parsing
+python-dotenv>=1.0.1             # Load environment variables from .env
