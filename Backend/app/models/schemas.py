@@ -11,8 +11,12 @@ class Coordinates(BaseModel):
 class RouteLeg(BaseModel):
     from_stop_id: str
     from_stop_name: str
+    from_stop_lat: Optional[float] = None
+    from_stop_lon: Optional[float] = None
     to_stop_id: str
     to_stop_name: str
+    to_stop_lat: Optional[float] = None
+    to_stop_lon: Optional[float] = None
     trip_id: str
     route_id: str
     agency_type: str  # "rail" | "bus" | "walk"

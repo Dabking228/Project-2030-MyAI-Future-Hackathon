@@ -1,3 +1,6 @@
+import { enableFirebaseTelemetry } from "@genkit-ai/firebase";
+enableFirebaseTelemetry();
+
 import { onCallGenkit } from "firebase-functions/https";
 import { setGlobalOptions } from "firebase-functions/v2";
 import * as admin from "firebase-admin";

@@ -73,12 +73,20 @@ def extract_path_details(
 
         from_name = graph.nodes[from_id].get("name", from_id)
         to_name = graph.nodes[to_id].get("name", to_id)
+        from_lat = graph.nodes[from_id].get("lat")
+        from_lon = graph.nodes[from_id].get("lon")
+        to_lat = graph.nodes[to_id].get("lat")
+        to_lon = graph.nodes[to_id].get("lon")
 
         leg = {
             "from_stop_id": from_id,
             "from_stop_name": from_name,
+            "from_stop_lat": from_lat,
+            "from_stop_lon": from_lon,
             "to_stop_id": to_id,
             "to_stop_name": to_name,
+            "to_stop_lat": to_lat,
+            "to_stop_lon": to_lon,
             "trip_id": best_edge.get("trip_id", ""),
             "route_id": best_edge.get("route_id", ""),
             "agency_type": best_edge.get("agency_type", ""),

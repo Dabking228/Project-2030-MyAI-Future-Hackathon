@@ -68,7 +68,11 @@ export type ParsedClarification = z.infer<typeof ParsedClarificationSchema>;
 
 export const RouteLegSchema = z.object({
     from_stop_name: z.string(),
+    from_stop_lat: z.number().optional().nullable(),
+    from_stop_lon: z.number().optional().nullable(),
     to_stop_name: z.string(),
+    to_stop_lat: z.number().optional().nullable(),
+    to_stop_lon: z.number().optional().nullable(),
     agency_type: z.enum(["rail", "bus", "walk"]),
     edge_type: z.enum(["transit", "walk"]),
     departure_time: z.string().optional(),

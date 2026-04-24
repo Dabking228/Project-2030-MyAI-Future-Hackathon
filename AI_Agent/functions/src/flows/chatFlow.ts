@@ -103,38 +103,50 @@ export const chatFlow = ai.defineFlow(
          Optimize for: ${intent.optimize_for}
          Return alternatives: ${intent.return_alternatives}`.trim();
 
-            // ai.generate() automatically handles the tool call loop
-            const toolResult = await ai.generate({
-                system: ORCHESTRATION_SYSTEM_PROMPT,
-                prompt: toolPrompt,
-                tools: [optimizeRouteTool, searchTransitStopsTool],
-                maxTurns: 3,
-                config: { temperature: 0 },
-            });
+            try {
+                // ai.generate() automatically handles the tool call loop
+                const toolResult = await ai.generate({
+                    system: ORCHESTRATION_SYSTEM_PROMPT,
+                    prompt: toolPrompt,
+                    tools: [optimizeRouteTool, searchTransitStopsTool],
+                    maxTurns: 3,
+                    config: { temperature: 0 },
+                });
 
-            // Extract the tool response text (the JSON string our tool returned)
-            const routeJson = _extractLastToolResponse(toolResult);
+                // Extract the tool response text (the JSON string our tool returned)
+                const routeJson = _extractLastToolResponse(toolResult);
 
-            const formattedText = await formatSingleRouteFlow({
-                routeData: routeJson,
-                userMessage: message,
-                optimizeFor: intent.optimize_for,
-            });
+                const formattedText = await formatSingleRouteFlow({
+                    routeData: routeJson,
+                    userMessage: message,
+                    optimizeFor: intent.optimize_for,
+                });
 
-            const routeData: RouteResponse = JSON.parse(routeJson);
+                const routeData: RouteResponse = JSON.parse(routeJson);
 
-            return {
-                text: formattedText,
-                intent: "single_route",
-                routeData: routeData.error
-                    ? null
-                    : {
-                        type: "single",
-                        recommended: routeData.recommended,
-                        alternatives: routeData.alternatives ?? [],
-                        reasoning: routeData.reasoning,
-                    },
-            };
+                return {
+                    text: formattedText,
+                    intent: "single_route",
+                    routeData: routeData.error
+                        ? null
+                        : {
+                            type: "single",
+                            recommended: routeData.recommended,
+                            alternatives: routeData.alternatives ?? [],
+                            reasoning: routeData.reasoning,
+                        },
+                };
+            } catch (err: any) {
+                console.error("[chatFlow] single_route tool error:", err);
+                return {
+                    text:
+                        `I’m sorry, I couldn’t fetch the route right now. ` +
+                        `The transit backend may be temporarily unreachable. ` +
+                        `Please try again in a moment.\n\n_Error: ${err?.message ?? "Unknown error"}_`,
+                    intent: "single_route",
+                    routeData: null,
+                };
+            }
         }
 
         // Multi-destination (TSP)
@@ -154,39 +166,51 @@ ${destList}
          Optimize for: ${intent.optimize_for}
          Return to origin: ${intent.return_to_origin}`.trim();
 
-            const toolResult = await ai.generate({
-                system: ORCHESTRATION_SYSTEM_PROMPT,
-                prompt: toolPrompt,
-                tools: [optimizeTSPRouteTool, searchTransitStopsTool],
-                maxTurns: 3,
-                config: { temperature: 0 },
-            });
+            try {
+                const toolResult = await ai.generate({
+                    system: ORCHESTRATION_SYSTEM_PROMPT,
+                    prompt: toolPrompt,
+                    tools: [optimizeTSPRouteTool, searchTransitStopsTool],
+                    maxTurns: 3,
+                    config: { temperature: 0 },
+                });
 
-            const tspJson = _extractLastToolResponse(toolResult);
-            const destinationNames = intent.destinations.map((d) => d.place_name);
+                const tspJson = _extractLastToolResponse(toolResult);
+                const destinationNames = intent.destinations.map((d) => d.place_name);
 
-            const formattedText = await formatTSPRouteFlow({
-                tspData: tspJson,
-                userMessage: message,
-                destinationNames,
-                optimizeFor: intent.optimize_for,
-            });
+                const formattedText = await formatTSPRouteFlow({
+                    tspData: tspJson,
+                    userMessage: message,
+                    destinationNames,
+                    optimizeFor: intent.optimize_for,
+                });
 
-            const tspData: TSPResponse = JSON.parse(tspJson);
+                const tspData: TSPResponse = JSON.parse(tspJson);
 
-            return {
-                text: formattedText,
-                intent: "multi_destination",
-                routeData: tspData.error
-                    ? null
-                    : {
-                        type: "multi",
-                        recommended: null,
-                        alternatives: [],
-                        reasoning: tspData.reasoning,
-                        tspLegs: tspData.legs_between_stops,
-                    },
-            };
+                return {
+                    text: formattedText,
+                    intent: "multi_destination",
+                    routeData: tspData.error
+                        ? null
+                        : {
+                            type: "multi",
+                            recommended: null,
+                            alternatives: [],
+                            reasoning: tspData.reasoning,
+                            tspLegs: tspData.legs_between_stops,
+                        },
+                };
+            } catch (err: any) {
+                console.error("[chatFlow] multi_destination tool error:", err);
+                return {
+                    text:
+                        `I’m sorry, I couldn’t plan the multi-destination route right now. ` +
+                        `The transit backend may be temporarily unreachable. ` +
+                        `Please try again in a moment.\n\n_Error: ${err?.message ?? "Unknown error"}_`,
+                    intent: "multi_destination",
+                    routeData: null,
+                };
+            }
         }
 
         // Unreachable — TypeScript exhaustiveness guard
